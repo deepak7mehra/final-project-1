@@ -5,6 +5,7 @@ import { Center } from "@repo/ui/center";
 import { Select } from "@repo/ui/select";
 import { useState } from "react";
 import { TextInput } from "@repo/ui/textinput";
+import { createOnRampTransaction } from "../app/lib/actions/createOnRamptxn";
 
 const SUPPORTED_BANKS = [{
     name: "HDFC Bank",
@@ -17,7 +18,7 @@ const SUPPORTED_BANKS = [{
 export const AddMoney = () => {
     const [redirectUrl, setRedirectUrl] = useState(SUPPORTED_BANKS[0]?.redirectUrl);
     const [amount,setAmount] = useState("")
-    const [provider,setProvider] = useState(SUPPORTED_BANKS[0]?.name)
+    const [provider,setProvider] = useState(SUPPORTED_BANKS[0]?.name || "")
 
     return <Card title="Add Money">
     <div className="w-full">
@@ -35,7 +36,8 @@ export const AddMoney = () => {
             value: x.name
         }))} />
         <div className="flex justify-center pt-4">
-            <Button onClick={() => {
+            <Button onClick={async () => {
+                await createOnRampTransaction(Number(amount),provider)
                 window.location.href = redirectUrl || "";
             }}>
             Add Money

@@ -1,11 +1,18 @@
 import express from "express";
+import bodyParser from 'body-parser';
 import db from "@repo/db/client"
 const app = express();
+
+
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: true })); 
 
 app.post("/hdfcWebhook", async (req, res) => {
     //TODO: Add zod validation here?
     //TODO: HDFC bank should ideally send us a secret so we know this is sent by them
-    const paymentInformation: {
+
+    
+   const paymentInformation: {
         token: string;
         userId: string;
         amount: string
@@ -14,6 +21,8 @@ app.post("/hdfcWebhook", async (req, res) => {
         userId: req.body.user_identifier,
         amount: req.body.amount
     };
+
+    
 
     try {
         await db.$transaction([
@@ -46,7 +55,7 @@ app.post("/hdfcWebhook", async (req, res) => {
         res.status(411).json({
             message: "Error while processing webhook"
         })
-    }
+    } 
 
 })
 
@@ -90,4 +99,4 @@ app.post("api/v1/addmoney",async (req,res)=>{
 
 })
 
-app.listen(3003);
+app.listen(3003,()=>console.log("hi there"));
