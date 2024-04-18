@@ -38,9 +38,17 @@ export const authOptions = {
                     data: {
                         phone: credentials.phone,
                         password: hashedPassword,
-                        email:"deepak7mher2"
+                        email:"deepak7mher"
                     }
                 });
+
+                const userBalance = await db.balance.create({
+                    data:{
+                        userId:user.id,
+                        amount:0,
+                        locked:0
+                    } 
+                })
             
                 return {
                     id: user.id.toString(),
