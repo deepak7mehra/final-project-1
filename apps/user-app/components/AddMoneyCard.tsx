@@ -38,7 +38,7 @@ export const AddMoney = () => {
         <div className="flex justify-center pt-4">
             <Button onClick={async () => {
                 await createOnRampTransaction(Number(amount),provider)
-                window.location.href = redirectUrl || "";
+                
             }}>
             Add Money
             </Button>

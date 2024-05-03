@@ -5,6 +5,9 @@ import { OnRampTransactions } from "../../../components/OnRampTransactions";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../lib/auth";
 
+let balance:any;
+let transactions:any;
+
 async function getBalance() {
     const session = await getServerSession(authOptions);
     const balance = await prisma.balance.findFirst({
@@ -27,7 +30,7 @@ async function getOnRampTransactions() {
         where: {
             userId: Number(session?.user?.id)
         }
-    });
+    },);
     return txns.map(t => ({
         time: t.startTime,
         amount: t.amount,
@@ -35,10 +38,26 @@ async function getOnRampTransactions() {
         provider: t.provider
     }))
 }
+async function fetchDataAndUpdate() {
+    balance = await getBalance();
+    transactions = await getOnRampTransactions();
+
+    // Update your UI with the new data here
+
+    console.log("Data updated at: ", new Date());
+}
+
+// Call the function initially and then every 5 seconds
+
+
+
+
 
 export default async function() {
-    const balance = await getBalance();
-    const transactions = await getOnRampTransactions();
+    await fetchDataAndUpdate(); // Call initially
+
+    setInterval(fetchDataAndUpdate, 5000);
+    
     
 
     return <div className="w-screen">
@@ -50,9 +69,9 @@ export default async function() {
                 <AddMoney />
             </div>
             <div>
-                <BalanceCard amount={balance.amount} locked={balance.locked} />
+                { balance && <BalanceCard amount={balance.amount} locked={balance.locked} />}
                 <div className="pt-4">
-                    <OnRampTransactions transactions={transactions} />
+                    {transactions && <OnRampTransactions transactions={transactions} />}
                 </div>
             </div>
         </div>
