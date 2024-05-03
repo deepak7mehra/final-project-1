@@ -100,4 +100,26 @@ app.post("api/v1/addmoney",async (req,res)=>{
 
 })
 
+app.post("api/v1/getBalance",async (req,res)=>{
+    try{
+        const userInfo:{userId:number} = {
+            userId:req.body.userId
+        }
+
+        const user = await db.user.findUnique({
+            where:{
+                id:userInfo.userId
+            }
+        })
+        return res.json({
+            message:user
+        })
+    }catch(errr){
+        return res.json({
+            message:errr
+        })
+    }
+})
+
+
 app.listen(3003,()=>console.log("hi there"));

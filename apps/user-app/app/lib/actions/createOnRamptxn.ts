@@ -29,7 +29,7 @@ export async function createOnRampTransaction(amount: number,provider: string){
         }
     })
 
-    await sleep(10000);
+    await sleep(3000);
 
     let stringAmount = String(amount);
 

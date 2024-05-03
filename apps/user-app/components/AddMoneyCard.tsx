@@ -6,6 +6,8 @@ import { Select } from "@repo/ui/select";
 import { useState } from "react";
 import { TextInput } from "@repo/ui/textinput";
 import { createOnRampTransaction } from "../app/lib/actions/createOnRamptxn";
+import { redirect } from "next/navigation";
+import Fetching from "./Fetching";
 
 const SUPPORTED_BANKS = [{
     name: "HDFC Bank",
@@ -16,12 +18,18 @@ const SUPPORTED_BANKS = [{
 }];
 
 export const AddMoney = () => {
+    const [fetching , setFetching] = useState(false);
     const [redirectUrl, setRedirectUrl] = useState(SUPPORTED_BANKS[0]?.redirectUrl);
     const [amount,setAmount] = useState("")
     const [provider,setProvider] = useState(SUPPORTED_BANKS[0]?.name || "")
 
     return <Card title="Add Money">
     <div className="w-full">
+        
+        {fetching && <div className="h-[300px] flex items-center justify-center flex-col "><Fetching/> <p>transction is being proccessed</p> </div>}
+
+
+        { !fetching && <div>
         <TextInput label={"Amount"} placeholder={"Amount"} onChange={(value) => {
             setAmount(value)
 
@@ -37,12 +45,18 @@ export const AddMoney = () => {
         }))} />
         <div className="flex justify-center pt-4">
             <Button onClick={async () => {
-                await createOnRampTransaction(Number(amount),provider)
+                setFetching(true);
+                await createOnRampTransaction(Number(amount),provider);
+               
+                location.replace(location.href);
+                
+                
                 
             }}>
             Add Money
             </Button>
         </div>
+        </div>}
     </div>
 </Card>
 }

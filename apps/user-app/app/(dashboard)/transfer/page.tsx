@@ -5,8 +5,7 @@ import { OnRampTransactions } from "../../../components/OnRampTransactions";
 import { getServerSession } from "next-auth";
 import { authOptions } from "../../lib/auth";
 
-let balance:any;
-let transactions:any;
+
 
 async function getBalance() {
     const session = await getServerSession(authOptions);
@@ -38,14 +37,7 @@ async function getOnRampTransactions() {
         provider: t.provider
     }))
 }
-async function fetchDataAndUpdate() {
-    balance = await getBalance();
-    transactions = await getOnRampTransactions();
 
-    // Update your UI with the new data here
-
-    console.log("Data updated at: ", new Date());
-}
 
 // Call the function initially and then every 5 seconds
 
@@ -54,9 +46,10 @@ async function fetchDataAndUpdate() {
 
 
 export default async function() {
-    await fetchDataAndUpdate(); // Call initially
+    const balance = await getBalance();
+    const transactions = await getOnRampTransactions();
 
-    setInterval(fetchDataAndUpdate, 5000);
+    
     
     
 
