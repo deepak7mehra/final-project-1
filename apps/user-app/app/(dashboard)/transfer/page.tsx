@@ -46,8 +46,19 @@ async function getOnRampTransactions() {
 
 
 export default async function() {
-    const balance = await getBalance();
+    const session = await getServerSession(authOptions);
+    const userid = session?.user?.id;
+    const balanceResponse = await fetch(`http://localhost:3000/api/balance?userid=${userid}`,{
+        method : "GET",
+        cache:"no-cache",
+        
+    });
+   const balance = await balanceResponse.json()
+   
+   console.log("balance = ",balance)
+
     const transactions = await getOnRampTransactions();
+    
 
     
     

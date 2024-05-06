@@ -13,6 +13,7 @@ export default async function p2pTransfer(to:string,amount:number) {
     const from = session?.user?.id;
     if (!from){
        return {
+        success : false,
         message : "error while sending msg"
        }
     }
@@ -26,31 +27,50 @@ export default async function p2pTransfer(to:string,amount:number) {
     if (!toUser){
         console.log("can not find user")
         return {
+            success : false,
             message:"user not found"
         }
     }
 
+    try {
+        await db.$transaction(async (tx)=>{
+            await tx.$queryRaw`SELECT * FROM "Balance" WHERE "userId" = ${Number(from)} FOR UPDATE`;
+            const fromBalance = await tx.balance.findUnique({
+                where: {userId:Number(from)}
+            })
     
-    await db.$transaction(async (tx)=>{
-        await tx.$queryRaw`SELECT * FROM "Balance" WHERE "userId" = ${Number(from)} FOR UPDATE`;
-        const fromBalance = await tx.balance.findUnique({
-            where: {userId:Number(from)}
+            if (!fromBalance ||  fromBalance.amount < amount){
+                throw new Error("Insufficent Balance")
+            }
+    
+            await tx.balance.update({
+                where:{userId:Number(from)},
+                data:{amount : {decrement : amount} }
+            })
+    
+            await tx.balance.update({
+                where : {userId : toUser.id},
+                data : {amount : {increment : amount}}
+            })
         })
-
-        if (!fromBalance ||  fromBalance.amount < amount){
-            throw new Error("Insufficent Balance")
+        return {
+            success : true,
+            message : "money transfered"
         }
+        
+    } catch (error) {
+        console.log(error);
+        return{
+            success : false,
+            message : "internal error"
+        }
+        
+    }
 
-        await tx.balance.update({
-            where:{userId:Number(from)},
-            data:{amount : {decrement : amount} }
-        })
+    
+    
 
-        await tx.balance.update({
-            where : {userId : toUser.id},
-            data : {amount : {increment : amount}}
-        })
-    })
+    
     
 
 
