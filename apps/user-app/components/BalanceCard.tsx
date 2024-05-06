@@ -1,9 +1,15 @@
+"use client"
 import { Card } from "@repo/ui/card";
+import { useSession } from "next-auth/react";
 
 export const BalanceCard = ({amount, locked}: {
     amount: number;
     locked: number;
 }) => {
+
+    const session = useSession();
+    console.log("seesion in client ",session)
+
     return <Card title={"Balance"}>
         <div className="flex justify-between border-b border-slate-300 pb-2">
             <div>
